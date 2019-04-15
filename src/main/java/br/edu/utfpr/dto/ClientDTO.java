@@ -3,6 +3,7 @@ package br.edu.utfpr.dto;
 import br.edu.utfpr.exception.OutCharacterClientException;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 
 @Builder
 @Data
@@ -10,7 +11,7 @@ public class ClientDTO {
     private int id;
     private String name;
     private int age;
-    private String telphone;
+    private String telephone;
     private double creditLimit;
     private CountryDTO country;
 
@@ -20,4 +21,5 @@ public class ClientDTO {
 
         this.name = name;
     }
+
 }
