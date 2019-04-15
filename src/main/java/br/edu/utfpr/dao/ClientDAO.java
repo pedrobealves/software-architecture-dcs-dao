@@ -1,9 +1,11 @@
 package br.edu.utfpr.dao;
 
 import br.edu.utfpr.dto.ClientDTO;
+import br.edu.utfpr.dto.CountryDTO;
 import lombok.extern.java.Log;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Log
@@ -69,14 +71,36 @@ public class ClientDAO {
 
     }
 
-    public ClientDTO read(int id) {
+    public ClientDTO read(int clientId) {
+        try (PreparedStatement pst = DriverManager.getConnection(DEFAULT_URL).prepareStatement(SELECT_ID)) {
 
+            pst.setInt(1, clientId);
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                return ClientDTO
+                        .builder()
+                        .id(rs.getInt("id"))
+                        .name(rs.getString("nome"))
+                        .telephone(rs.getString("telefone"))
+                        .age(rs.getInt("idade"))
+                        .creditLimit(rs.getDouble("limiteCredito"))
+                        .country(CountryDTO
+                                .builder()
+                                .id(rs.getInt("id_pais"))
+                                .name(rs.getString("nome_pais"))
+                                .abbrev(rs.getString("sigla_pais"))
+                                .code(rs.getInt("codigo_pais"))
+                                .build())
+                        .build();
+            } else {
+                log.info("No Records for Id Client: " + clientId);
+            }
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
         return null;
-    }
-
-
-    public void update(int id) {
-
     }
 
     public void delete(int id) {
@@ -94,7 +118,32 @@ public class ClientDAO {
 
 
     public List<ClientDTO> selectAll() {
+        try (PreparedStatement pst = DriverManager.getConnection(DEFAULT_URL).prepareStatement(SELECT_ALL)) {
 
+            List<ClientDTO> clients = new ArrayList<>();
+
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                clients.add(ClientDTO
+                        .builder()
+                        .id(rs.getInt("id"))
+                        .name(rs.getString("nome"))
+                        .telephone(rs.getString("telefone"))
+                        .age(rs.getInt("idade"))
+                        .creditLimit(rs.getDouble("limiteCredito"))
+                        .country(CountryDTO
+                                .builder()
+                                .id(rs.getInt("id_pais"))
+                                .name(rs.getString("nome_pais"))
+                                .abbrev(rs.getString("sigla_pais"))
+                                .code(rs.getInt("codigo_pais"))
+                                .build())
+                        .build());
+            }
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
         return null;
     }
 }
