@@ -20,6 +20,6 @@ public class ClientService {
     }
 
     public List<ClientDTO> list() {
-        return clientDAO.getAll();
+        return clientDAO.selectAll();
     }
 }
