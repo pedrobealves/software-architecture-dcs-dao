@@ -3,7 +3,7 @@ package br.edu.utfpr;
 import br.edu.utfpr.dto.ClientDTO;
 import br.edu.utfpr.dto.CountryDTO;
 import br.edu.utfpr.exception.DuplicatedClientException;
-import br.edu.utfpr.service.ClientService;
+import br.edu.utfpr.business.ClientService;
 
 public class Main {
 
