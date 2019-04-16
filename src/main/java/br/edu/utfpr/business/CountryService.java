@@ -1,4 +1,4 @@
-package br.edu.utfpr.service;
+package br.edu.utfpr.business;
 
 import br.edu.utfpr.dto.CountryDTO;
 
