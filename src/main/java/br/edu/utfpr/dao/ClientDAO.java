@@ -15,8 +15,8 @@ public class ClientDAO {
     private static final String INSERT = "INSERT INTO cliente (id,nome,telefone,idade,limiteCredito,id_pais) VALUES(?,?,?,?,?,?)";
     private static final String UPDATE = "UPDATE cliente SET nome=?, telefone=?,idade=?,limiteCredito=?,id_pais=? WHERE id=?";
     private static final String DELETE = "DELETE FROM cliente WHERE id = ?";
-    private static final String SELECT_ID = "SELECT * FROM cliente WHERE ID = ?";
-    private static final String SELECT_ALL = "SELECT * FROM cliente";
+    private static final String SELECT_ID = "SELECT * FROM cliente JOIN pais ON id_pais = pais.id WHERE ID = ?";
+    private static final String SELECT_ALL = "SELECT * FROM cliente JOIN pais ON id_pais = pais.id";
 
     public ClientDAO() {
         try (Connection conn = DriverManager.getConnection(DEFAULT_URL)) {
@@ -56,11 +56,12 @@ public class ClientDAO {
 
         try (PreparedStatement pst = DriverManager.getConnection(DEFAULT_URL).prepareStatement(UPDATE)) {
 
-            pst.setString(2, client.getName());
-            pst.setString(3, client.getTelephone());
-            pst.setInt(4, client.getAge());
-            pst.setDouble(5, client.getCreditLimit());
-            pst.setInt(6, client.getCountry().getId());
+            pst.setString(1, client.getName());
+            pst.setString(2, client.getTelephone());
+            pst.setInt(3, client.getAge());
+            pst.setDouble(4, client.getCreditLimit());
+            pst.setInt(5, client.getCountry().getId());
+            pst.setInt(6, client.getId());
 
             final int recordUpdated = pst.executeUpdate();
             log.info("Records Update: " + recordUpdated);
@@ -80,17 +81,17 @@ public class ClientDAO {
             if (rs.next()) {
                 return ClientDTO
                         .builder()
-                        .id(rs.getInt("id"))
-                        .name(rs.getString("nome"))
+                        .id(rs.getInt("cliente.id"))
+                        .name(rs.getString("cliente.nome"))
                         .telephone(rs.getString("telefone"))
                         .age(rs.getInt("idade"))
                         .creditLimit(rs.getDouble("limiteCredito"))
                         .country(CountryDTO
                                 .builder()
-                                .id(rs.getInt("id_pais"))
-                                .name(rs.getString("nome_pais"))
-                                .abbrev(rs.getString("sigla_pais"))
-                                .code(rs.getInt("codigo_pais"))
+                                .id(rs.getInt("pais.id"))
+                                .name(rs.getString("pais.nome"))
+                                .abbrev(rs.getString("sigla"))
+                                .code(rs.getInt("codigoTelefone"))
                                 .build())
                         .build();
             } else {
@@ -124,23 +125,24 @@ public class ClientDAO {
 
             ResultSet rs = pst.executeQuery();
 
-            if (rs.next()) {
+            while (rs.next()) {
                 clients.add(ClientDTO
                         .builder()
-                        .id(rs.getInt("id"))
-                        .name(rs.getString("nome"))
+                        .id(rs.getInt("cliente.id"))
+                        .name(rs.getString("cliente.nome"))
                         .telephone(rs.getString("telefone"))
                         .age(rs.getInt("idade"))
                         .creditLimit(rs.getDouble("limiteCredito"))
                         .country(CountryDTO
                                 .builder()
-                                .id(rs.getInt("id_pais"))
-                                .name(rs.getString("nome_pais"))
-                                .abbrev(rs.getString("sigla_pais"))
-                                .code(rs.getInt("codigo_pais"))
+                                .id(rs.getInt("pais.id"))
+                                .name(rs.getString("pais.nome"))
+                                .abbrev(rs.getString("sigla"))
+                                .code(rs.getInt("codigoTelefone"))
                                 .build())
                         .build());
             }
+            return clients;
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         }
